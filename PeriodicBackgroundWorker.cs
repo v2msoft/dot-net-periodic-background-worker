@@ -4,7 +4,7 @@ using System.Timers;
 
 namespace V2MSoftware.Threading {
 
-    abstract class PeriodicBackgroundWorker {
+    public abstract class PeriodicBackgroundWorker {
 
         #region Private Properties
         private System.Timers.Timer Timer { get; set; }
@@ -86,6 +86,26 @@ namespace V2MSoftware.Threading {
             this.SyncMutex.WaitOne();
             this.SyncMutex.Set();
         }
+
+        /// <summary>
+        /// Stops the periodic task executor without waiting the current task to stop.
+        /// </summary>
+        public void Terminate() {
+            this.Timer.Stop();
+        }
+
+        /// <summary>
+        /// Calls the background taks instantaneously. This method could not be called when the 
+        /// worker is running. For this reason, always call Stop() method before performing a
+        /// call to ExecuteTask();
+        /// </summary>
+        public void ExecuteTask() {
+            if (this.Timer.Enabled) {
+                throw new Exception("Task could not be executed independently when the worker is running!");
+            }
+            this.DoWork(null,null);
+        }
+
     }
 }
 
